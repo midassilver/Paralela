@@ -56,14 +56,9 @@ int main(int argc, char* argv[]) {
  
     generar_adn(cadena_adn, parametros.longitud_adn);
 
-    generar_patrones(
-        patrones,
-        parametros.longitud_patron,
-        parametros.cantidad_patrones
-    );
+    generar_patrones(patrones, parametros.longitud_patron, parametros.cantidad_patrones);
 
-    buscar_patrones_lineal(cadena_adn, parametros.longitud_adn, patrones, parametros.cantidad_patrones
-    );
+    buscar_patrones_lineal(cadena_adn, parametros.longitud_adn, patrones, parametros.cantidad_patrones);
 
     for (int i = 0; i < parametros.cantidad_patrones; i++) {
 
@@ -87,7 +82,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    /* Liberar memoria */
     for (int i = 0; i < parametros.cantidad_patrones; i++) {
         free(patrones[i].patron);
     }
