@@ -76,4 +76,6 @@ void generar_adn(char* adn_ptr, int n);
  */
 void generar_patrones(patron_t* patrones, int longitud, int cantidad_patrones);
 
+
+
 #endif

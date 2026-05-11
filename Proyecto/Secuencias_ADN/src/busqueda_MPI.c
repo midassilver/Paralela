@@ -1,14 +1,11 @@
 #include "../include/cadenas.h"
-#include "../include/busqueda_lineal.h"
+#include "../include/busqueda_MPI.h"
 #include "../include/parametros.h"
 
 
-void buscar_patrones_lineal(const char* cadena_adn, int longitud_cadena_adn, patron_t* patrones, int cantidad_patrones) {
-
-    for (int p = 0; p < cantidad_patrones; p++) {
-
-        char* patron = patrones[p].patron;
-        int longitud_patron = patrones[p].longitud;
+void buscar_patrones_MPI(const char* cadena_adn, int longitud_cadena_adn, patron_t* patrones) {
+        char* patron = patrones->patron;
+        int longitud_patron = patrones->longitud;
 
         int coincidencia_en = -1;
 
@@ -34,12 +31,12 @@ void buscar_patrones_lineal(const char* cadena_adn, int longitud_cadena_adn, pat
 
         if (coincidencia_en != -1) {
 
-            patrones[p].encontrado_en = coincidencia_en;
-            patrones[p].estado = COINCIDENCIA;
+            patrones->encontrado_en = coincidencia_en;
+            patrones->estado = COINCIDENCIA;
 
         } else {
 
-            patrones[p].estado = NO_ENCONTRADO;
+            patrones->estado = NO_ENCONTRADO;
         }
-    }
 }
+
