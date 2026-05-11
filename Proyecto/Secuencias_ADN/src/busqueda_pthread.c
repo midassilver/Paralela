@@ -1,11 +1,12 @@
-#include "../include/cadenas_pthread.h"
+#include "../include/busqueda_pthread.h"
 #include "../include/parametros.h"
+#include "../include/cadenas.h"
 
 void* trabajador_hilo(void* arg) {
 
     argumentos_hilo_t* datos = (argumentos_hilo_t*) arg;
 
-    for (int p = datos->indice_inicio; p < datos->indice_final; p++) {
+    for (int p = datos->indice_inicio; p < datos->indice_fin; p++) {
 
         patron_t* patron_estructura = &datos->patrones[p];
 
@@ -15,8 +16,7 @@ void* trabajador_hilo(void* arg) {
 
         int coincidencia_en = NO_ENCONTRADO;
 
-        int fin_busqueda = datos->longitud_adn - longitud_patron;
-
+        int fin_busqueda = datos->longitud_cadena_adn - longitud_patron;
 
         for (int i = 0; i <= fin_busqueda; i++) {
 
@@ -29,7 +29,6 @@ void* trabajador_hilo(void* arg) {
                 }
             }
 
- 
             if (j == longitud_patron) {
 
                 coincidencia_en = i;
@@ -41,7 +40,6 @@ void* trabajador_hilo(void* arg) {
         if (coincidencia_en != NO_ENCONTRADO) {
 
             patron_estructura->encontrado_en = coincidencia_en;
-
             patron_estructura->estado = ENCONTRADO;
 
         } else {
@@ -52,10 +50,6 @@ void* trabajador_hilo(void* arg) {
 
     return NULL;
 }
-
-/*
-    Función principal de búsqueda paralela con pthreads
-*/
 void buscar_patrones_pthread(
     const char* cadena_adn,
     int longitud_adn,
@@ -65,27 +59,24 @@ void buscar_patrones_pthread(
 ) {
 
     pthread_t hilos[cantidad_hilos];
-
     argumentos_hilo_t argumentos[cantidad_hilos];
 
     int patrones_por_hilo = cantidad_patrones / cantidad_hilos;
-
 
     for (int i = 0; i < cantidad_hilos; i++) {
 
         argumentos[i].cadena_adn = cadena_adn;
 
-        argumentos[i].longitud_adn = longitud_adn;
+        argumentos[i].longitud_cadena_adn = longitud_adn;
 
         argumentos[i].patrones = patrones;
 
         argumentos[i].indice_inicio = i * patrones_por_hilo;
 
-        argumentos[i].indice_final =
+        argumentos[i].indice_fin =
             (i == cantidad_hilos - 1)
             ? cantidad_patrones
             : (i + 1) * patrones_por_hilo;
-
 
         pthread_create(
             &hilos[i],
@@ -95,9 +86,7 @@ void buscar_patrones_pthread(
         );
     }
 
-
     for (int i = 0; i < cantidad_hilos; i++) {
-
         pthread_join(hilos[i], NULL);
     }
 }

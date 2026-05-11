@@ -18,7 +18,10 @@ SOURCES = \
 	$(SRC_DIR)/cadenas.c \
 	$(SRC_DIR)/busqueda_lineal.c \
 	$(SRC_DIR)/busqueda_MPI.c \
+	$(SRC_DIR)/busqueda_pthread.c \
 	$(SRC_DIR)/parametros.c
+
+SRC := $(filter-out src/main.c, $(wildcard src/*.c))
 
 # Archivos objeto
 OBJECTS = $(SOURCES:.c=.o)
@@ -38,6 +41,11 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 # Ejecutar programa
 run: all
 	./$(TARGET)
+
+.PHONY: test
+
+test:
+	mpicc tests/test.c src/busqueda_lineal.c src/busqueda_MPI.c src/busqueda_pthread.c src/cadenas.c src/parametros.c -Iinclude -o test && ./test
 
 # Ejecutar con MPI
 run_mpi: all

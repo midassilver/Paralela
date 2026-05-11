@@ -2,7 +2,7 @@
 #include "../include/cadenas.h"
 #include "../include/busqueda_MPI.h"
 #include "../include/busqueda_lineal.h"
-#include "../include/cadenas_pthread.h"
+#include "../include/busqueda_pthread.h"
 #include "../include/parametros.h"
 
 int main(int argc, char* argv[]) {
