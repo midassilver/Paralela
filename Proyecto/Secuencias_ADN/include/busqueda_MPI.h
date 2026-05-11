@@ -2,6 +2,7 @@
 #define BUSQUEDA_MPI_H
 
 #include "cadenas.h"
+#include "parametros.h"
 #include <mpi.h>
 
 typedef struct {
@@ -16,6 +17,8 @@ typedef struct {
  * \param patrones Arreglo de patrones a buscar.
  * \param cantidad_patrones Cantidad de patrones en el arreglo.
  */
-void buscar_patrones_MPI(const char* cadena_adn,int longitud_cadena_adn,patron_t* patrones);
+patron_t* buscar_patrones_MPI(parametros_t parametros);
+
+void busqueda_por_patron(const char* cadena_adn, int longitud_cadena_adn, patron_t* patrones);
 
 #endif
