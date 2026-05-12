@@ -17,7 +17,7 @@ typedef struct {
  * \param patrones Arreglo de patrones a buscar.
  * \param cantidad_patrones Cantidad de patrones en el arreglo.
  */
-patron_t* buscar_patrones_MPI(parametros_t parametros);
+patron_t* buscar_patrones_MPI(parametros_t parametros, char* cadena_adn_MPI, patron_t* patrones_MPI);
 
 void busqueda_por_patron(const char* cadena_adn, int longitud_cadena_adn, patron_t* patrones);
 

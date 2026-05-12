@@ -51,6 +51,9 @@ test:
 run_mpi: all
 	mpirun -np 4 ./$(TARGET)
 
+run_valgrind: all
+	mpirun -np 4 valgrind --gen-suppressions=all ./$(TARGET)
+
 # Limpiar archivos compilados
 clean:
 	rm -f $(SRC_DIR)/*.o

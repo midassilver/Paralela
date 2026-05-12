@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     */
     printf("\n=== BUSQUEDA MPI ===\n");
 
-    patron_t *patrones_MPI = buscar_patrones_MPI(parametros);
+    patron_t *patrones_MPI = buscar_patrones_MPI(parametros, cadena_adn, patrones);
 
     for (int i = 0; i < parametros.cantidad_patrones; i++) {
 

@@ -4,7 +4,7 @@
 
 
 
-patron_t* buscar_patrones_MPI(parametros_t parametros) { /*TODO: Actualmente solo puede usarse con los valores aleatorios generados por 
+patron_t* buscar_patrones_MPI(parametros_t parametros, char* cadena_adn_MPI, patron_t* patrones_MPI) { /*TODO: Actualmente solo puede usarse con los valores aleatorios generados por 
                                                       generar_adn y generar_patrones */
     MPI_Init(NULL, NULL); //Inicializa el proceso de mpi
 
@@ -13,10 +13,15 @@ patron_t* buscar_patrones_MPI(parametros_t parametros) { /*TODO: Actualmente sol
     MPI_Comm_rank(MPI_COMM_WORLD, &rango);
     MPI_Comm_size(MPI_COMM_WORLD, &tamaño);
 
-    char *cadena_adn_MPI = reservar_vector(parametros.longitud_adn);
-    patron_t *patrones_MPI = reservar_patrones(parametros.cantidad_patrones, parametros.longitud_patron);
+    if(cadena_adn_MPI == NULL){
+        cadena_adn_MPI = reservar_vector(parametros.longitud_adn);
+    } 
+    if(patrones_MPI == NULL){
+        patrones_MPI = reservar_patrones(parametros.cantidad_patrones, parametros.longitud_patron);
+    }
 
-    if(rango == 0){ //Codigo unico del root que genera los datos
+
+    if(rango == 0 && cadena_adn_MPI == NULL && patrones_MPI == NULL){ //Codigo unico del root que genera los datos
         generar_adn(cadena_adn_MPI, parametros.longitud_adn);
         generar_patrones(patrones_MPI, parametros.longitud_patron, parametros.cantidad_patrones);
     }
