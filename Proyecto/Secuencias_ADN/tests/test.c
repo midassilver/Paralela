@@ -4,6 +4,7 @@
 
 #include "../include/busqueda_lineal.h"
 #include "../include/busqueda_pthread.h"
+#include "../include/busqueda_MPI.h"
 
 int main(){
 
@@ -52,6 +53,8 @@ int main(){
 
     patron_t* patrones_secuenciales = malloc(sizeof(patron_t) * 50);
     patron_t* patrones_pthreads = malloc(sizeof(patron_t) * 50);
+    patron_t* patrones_mpi = malloc(sizeof(patron_t) * 50);
+    
 
     for(int i = 0; i < 50; i++){
 
@@ -68,18 +71,28 @@ int main(){
 
         patrones_pthreads[i].patron = malloc(patrones_nuevos[i].longitud + 1);
         strcpy(patrones_pthreads[i].patron, patrones_nuevos[i].patron);
+
+        patrones_mpi[i].longitud = patrones_nuevos[i].longitud;
+        patrones_mpi[i].encontrado_en = patrones_nuevos[i].encontrado_en;
+        patrones_mpi[i].estado = patrones_nuevos[i].estado;
+
+        patrones_mpi[i].patron = malloc(patrones_nuevos[i].longitud + 1);
+        strcpy(patrones_mpi[i].patron, patrones_nuevos[i].patron);
     }
     
     buscar_patrones_lineal(adn, 100000, patrones_secuenciales, 50);
     buscar_patrones_pthread(adn, 100000, patrones_pthreads, 50, 5);
+    parametros_t mpi_parametros = {.cantidad_patrones = 50, .longitud_adn = 10000, .longitud_patron = 5, .numero_hilos = 5};
+    patrones_mpi = buscar_patrones_MPI(mpi_parametros, adn, patrones_secuenciales);
+
     for(int i = 0; i < 50; i++){
         assert(
-            patrones_secuenciales[i].encontrado_en ==
-            patrones_pthreads[i].encontrado_en
+            patrones_secuenciales[i].encontrado_en == patrones_pthreads[i].encontrado_en &&
+            patrones_secuenciales[i].encontrado_en == patrones_mpi[i].encontrado_en
         );
         assert(
-            patrones_secuenciales[i].estado ==
-            patrones_pthreads[i].estado
+            patrones_secuenciales[i].estado == patrones_pthreads[i].estado &&
+            patrones_mpi[i].estado == patrones_secuenciales[i].estado 
         );
     }
 

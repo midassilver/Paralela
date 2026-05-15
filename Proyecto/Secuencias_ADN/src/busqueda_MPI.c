@@ -4,8 +4,7 @@
 
 
 
-patron_t* buscar_patrones_MPI(parametros_t parametros, char* cadena_adn_MPI, patron_t* patrones_MPI) { /*TODO: Actualmente solo puede usarse con los valores aleatorios generados por 
-                                                      generar_adn y generar_patrones */
+patron_t* buscar_patrones_MPI(parametros_t parametros, char* cadena_adn_MPI, patron_t* patrones_MPI) { 
     MPI_Init(NULL, NULL); //Inicializa el proceso de mpi
 
     int rango, tamaño; //Nos da el rango de cada proceso y la cantidad de procesos

@@ -2,7 +2,7 @@
 CC = mpicc
 
 # Flags de compilación
-CFLAGS = -Wall -Wextra -O2
+CFLAGS = -Wall -Wextra -O2 -g
 
 # Carpetas
 SRC_DIR = src
@@ -45,7 +45,7 @@ run: all
 .PHONY: test
 
 test:
-	mpicc tests/test.c src/busqueda_lineal.c src/busqueda_MPI.c src/busqueda_pthread.c src/cadenas.c src/parametros.c -Iinclude -o test && ./test
+	mpicc -g tests/test.c src/busqueda_lineal.c src/busqueda_MPI.c src/busqueda_pthread.c src/cadenas.c src/parametros.c -Iinclude -o test && ./test
 
 # Ejecutar con MPI
 run_mpi: all
