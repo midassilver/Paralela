@@ -4,26 +4,28 @@ Programa en C para buscar patrones dentro de cadenas de ADN usando busqueda line
 
 ## Estructura del proyecto
 
-|---- PARALELA
-|  |---- README.md
-|  |---- Proyecto
-|  |  |---- Secuencias_ADN
-|  |  |  |---- makefile
-|  |  |  |---- include
-|  |  |  |  |---- busqueda_lineal.h
-|  |  |  |  |---- busqueda_MPI.h
-|  |  |  |  |---- busqueda_pthread.h
-|  |  |  |  |---- cadenas.h
-|  |  |  |  |---- parametros.h
-|  |  |  |---- src
-|  |  |  |  |---- busqueda_lineal.c
-|  |  |  |  |---- busqueda_MPI.c
-|  |  |  |  |---- busqueda_pthread.c
-|  |  |  |  |---- cadenas.c
-|  |  |  |  |---- parametros.c
-|  |  |  |  |---- main.c
-|  |  |  |---- tests
-|  |  |  |  |---- test.c
+```
+PARALELA/
+├── README.md
+└── Proyecto/
+    └── Secuencias_ADN/
+        ├── makefile
+        ├── include/
+        │   ├── busqueda_lineal.h
+        │   ├── busqueda_MPI.h
+        │   ├── busqueda_pthread.h
+        │   ├── cadenas.h
+        │   └── parametros.h
+        ├── src/
+        │   ├── busqueda_lineal.c
+        │   ├── busqueda_MPI.c
+        │   ├── busqueda_pthread.c
+        │   ├── cadenas.c
+        │   ├── parametros.c
+        │   └── main.c
+        └── tests/
+            └── test.c
+```
 
 ## Compilacion
 
