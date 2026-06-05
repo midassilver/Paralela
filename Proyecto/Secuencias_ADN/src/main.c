@@ -61,6 +61,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    destruir_hilos(parametros.numero_hilos);
+
     /*
         BUSQUEDA MPI
     */

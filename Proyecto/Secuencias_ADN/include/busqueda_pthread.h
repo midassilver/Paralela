@@ -13,6 +13,8 @@
 void* trabajador_hilo(void* arg);
 
 
-void buscar_patrones_pthread(const char* cadena_adn,int longitud_adn,patron_t* patrones,int cantidad_patrones,int cantidad_hilos);
+void buscar_patrones_pthread(const char* cadena_adn, int longitud_adn, patron_t* patrones, int cantidad_patrones, int cantidad_hilos);
+
+void destruir_hilos(int cantidad_hilos);
 
 #endif
