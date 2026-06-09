@@ -2,7 +2,8 @@
 CC = mpicc
 
 # Flags de compilación
-CFLAGS = -Wall -Wextra -O2 -g
+CFLAGS = -Wall -Wextra -O2 -g -pthread
+LDLIBS = -lOpenCL
 
 # Carpetas
 SRC_DIR = src
@@ -18,6 +19,7 @@ SOURCES = \
 	$(SRC_DIR)/cadenas.c \
 	$(SRC_DIR)/busqueda_lineal.c \
 	$(SRC_DIR)/busqueda_MPI.c \
+	$(SRC_DIR)/busqueda_opencl.c \
 	$(SRC_DIR)/busqueda_pthread.c \
 	$(SRC_DIR)/parametros.c
 
@@ -32,7 +34,7 @@ all: $(TARGET)
 # Crear ejecutable
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LDLIBS)
 
 # Compilar archivos .c -> .o
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
@@ -45,7 +47,7 @@ run: all
 .PHONY: test
 
 test:
-	mpicc -g tests/test.c src/busqueda_lineal.c src/busqueda_MPI.c src/busqueda_pthread.c src/cadenas.c src/parametros.c -Iinclude -o test && ./test
+	mpicc -g -pthread tests/test.c src/busqueda_lineal.c src/busqueda_MPI.c src/busqueda_opencl.c src/busqueda_pthread.c src/cadenas.c src/parametros.c -Iinclude -o test $(LDLIBS) && ./test
 
 # Ejecutar con MPI
 run_mpi: all

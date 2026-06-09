@@ -2,6 +2,7 @@
 #include "../include/cadenas.h"
 #include "../include/busqueda_MPI.h"
 #include "../include/busqueda_lineal.h"
+#include "../include/busqueda_opencl.h"
 #include "../include/busqueda_pthread.h"
 #include "../include/parametros.h"
 
@@ -62,6 +63,32 @@ int main(int argc, char* argv[]) {
     }
 
     destruir_hilos(parametros.numero_hilos);
+
+    /*
+        BUSQUEDA OPENCL
+    */
+    printf("\n=== BUSQUEDA OPENCL ===\n");
+
+    if (buscar_patrones_opencl(cadena_adn, parametros.longitud_adn, patrones, parametros.cantidad_patrones) == 0) {
+
+        for (int i = 0; i < parametros.cantidad_patrones; i++) {
+
+            printf("Patron %d [%s] - Estado [%d]", i, patrones[i].patron, patrones[i].estado);
+
+            if (patrones[i].estado == COINCIDENCIA) {
+
+                printf(" - Posicion %d\n", patrones[i].encontrado_en);
+
+            } else {
+
+                printf(" - No encontrado\n");
+            }
+        }
+
+    } else {
+
+        printf("No se pudo ejecutar la busqueda OpenCL.\n");
+    }
 
     /*
         BUSQUEDA MPI

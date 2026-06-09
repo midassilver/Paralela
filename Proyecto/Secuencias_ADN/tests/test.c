@@ -5,6 +5,7 @@
 #include "../include/busqueda_lineal.h"
 #include "../include/busqueda_pthread.h"
 #include "../include/busqueda_MPI.h"
+#include "../include/busqueda_opencl.h"
 
 int main(){
 
@@ -54,6 +55,7 @@ int main(){
     patron_t* patrones_secuenciales = malloc(sizeof(patron_t) * 50);
     patron_t* patrones_pthreads = malloc(sizeof(patron_t) * 50);
     patron_t* patrones_mpi = malloc(sizeof(patron_t) * 50);
+    patron_t* patrones_opencl = malloc(sizeof(patron_t) * 50);
     
 
     for(int i = 0; i < 50; i++){
@@ -78,12 +80,23 @@ int main(){
 
         patrones_mpi[i].patron = malloc(patrones_nuevos[i].longitud + 1);
         strcpy(patrones_mpi[i].patron, patrones_nuevos[i].patron);
+
+        patrones_opencl[i].longitud = patrones_nuevos[i].longitud;
+        patrones_opencl[i].encontrado_en = patrones_nuevos[i].encontrado_en;
+        patrones_opencl[i].estado = patrones_nuevos[i].estado;
+
+        patrones_opencl[i].patron = malloc(patrones_nuevos[i].longitud + 1);
+        strcpy(patrones_opencl[i].patron, patrones_nuevos[i].patron);
     }
     
     buscar_patrones_lineal(adn, 100000, patrones_secuenciales, 50);
     buscar_patrones_pthread(adn, 100000, patrones_pthreads, 50, 5);
-    parametros_t mpi_parametros = {.cantidad_patrones = 50, .longitud_adn = 10000, .longitud_patron = 5, .numero_hilos = 5};
-    patrones_mpi = buscar_patrones_MPI(mpi_parametros, adn, patrones_secuenciales);
+    destruir_hilos(5);
+
+    int opencl_disponible = buscar_patrones_opencl(adn, 100000, patrones_opencl, 50) == 0;
+
+    parametros_t mpi_parametros = {.cantidad_patrones = 50, .longitud_adn = 100000, .longitud_patron = 5, .numero_hilos = 5};
+    patrones_mpi = buscar_patrones_MPI(mpi_parametros, adn, patrones_mpi);
 
     for(int i = 0; i < 50; i++){
         assert(
@@ -94,6 +107,15 @@ int main(){
             patrones_secuenciales[i].estado == patrones_pthreads[i].estado &&
             patrones_mpi[i].estado == patrones_secuenciales[i].estado 
         );
+
+        if (opencl_disponible) {
+            assert(patrones_secuenciales[i].encontrado_en == patrones_opencl[i].encontrado_en);
+            assert(patrones_secuenciales[i].estado == patrones_opencl[i].estado);
+        }
+    }
+
+    if (!opencl_disponible) {
+        printf("OpenCL no disponible, prueba OpenCL omitida\n");
     }
 
     printf("Tests pasados\n");
