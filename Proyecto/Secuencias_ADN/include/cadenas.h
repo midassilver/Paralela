@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
 
 /** \def COINCIDENCIA
  * \brief Estado que indica que el patrón fue encontrado.
@@ -39,11 +40,16 @@ typedef struct {
  * \brief Argumentos enviados a hilos/procesos para ejecución paralela.
  */
 typedef struct {
-    const char* cadena_adn;      /**< Puntero a la cadena principal de ADN */
-    int longitud_cadena_adn;     /**< Longitud de la cadena principal */
-    patron_t* patrones;          /**< Arreglo de patrones a buscar */
-    int indice_inicio;           /**< Índice inicial del trabajo */
-    int indice_fin;              /**< Índice final del trabajo */
+    const char* cadena_adn;           /**< Puntero a la cadena principal de ADN */
+    int longitud_cadena_adn;          /**< Longitud de la cadena principal */
+    patron_t* patrones;               /**< Arreglo de patrones a buscar */
+    int cantidad_patrones;            /**< Cantidad de patrones a trabajar */
+    int* siguiente_patron;            /**< Índice de patrones compartido */
+    pthread_mutex_t* mutex;           /**< Proteccion principal */
+    pthread_cond_t* hay_trabajo;      /**< Hilos duermen cuando no hay trabajo */
+    pthread_cond_t* trabajo_terminado; /**< Principal duerme esperando un resultado */
+    int* activo;                      /**< Apaga o enciende los hilos */
+    int* trabajos_pendientes;         /**< Patrones faltantes */
 } argumentos_hilo_t;
 
 /**
