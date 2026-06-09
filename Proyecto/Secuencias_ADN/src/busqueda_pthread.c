@@ -2,6 +2,16 @@
 #include "../include/parametros.h"
 #include "../include/cadenas.h"
 
+static pthread_t* hilos = NULL;
+static argumentos_hilo_t* argumentos = NULL;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t hay_trabajo = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t trabajo_terminado = PTHREAD_COND_INITIALIZER;
+static int siguiente_patron = 0;
+static int trabajos_pendientes = 0;
+static int activo = 1;
+static int hilos_creados = 0;
+
 void* trabajador_hilo(void* arg) {
 
     argumentos_hilo_t* datos = (argumentos_hilo_t*) arg;
@@ -19,8 +29,8 @@ void* trabajador_hilo(void* arg) {
             break;
         }
 
-        int patron_actual = *datos->siguiente_patron; 
-        *datos->siguiente_patron++;
+        int patron_actual = *datos->siguiente_patron;
+        (*datos->siguiente_patron)++;
         //Guardamos y actualizamos el patron un hilo a la vez
 
         pthread_mutex_unlock(datos->mutex);
@@ -55,15 +65,16 @@ void* trabajador_hilo(void* arg) {
         if (coincidencia_en != NO_ENCONTRADO) {
 
             patron_estructura->encontrado_en = coincidencia_en;
-            patron_estructura->estado = ENCONTRADO;
+            patron_estructura->estado = COINCIDENCIA;
 
         } else {
 
+            patron_estructura->encontrado_en = NO_ENCONTRADO;
             patron_estructura->estado = NO_ENCONTRADO;
         }
 
         pthread_mutex_lock(datos->mutex);
-        *datos->trabajos_pendientes--;
+        (*datos->trabajos_pendientes)--;
 
         if(*datos->trabajos_pendientes == 0){
             pthread_cond_signal(datos->trabajo_terminado);
@@ -83,20 +94,28 @@ void buscar_patrones_pthread(
     int cantidad_hilos
 ) {
 
-    static pthread_t* hilos = NULL;
-    static argumentos_hilo_t* argumentos = NULL;
-    static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-    static pthread_cond_t hay_trabajo = PTHREAD_COND_INITIALIZER;
-    static pthread_cond_t trabajo_terminado = PTHREAD_COND_INITIALIZER;
-    static int siguiente_patron = 0;
-    static int trabajos_pendientes = 0;
-    static int activo = 1;
+    if (cantidad_hilos <= 0) {
+        fprintf(stderr, "Error: la cantidad de hilos debe ser mayor que cero.\n");
+        return;
+    }
 
     //Los hilos se crean solo una vez y las variables se mantienen entre llamadas
 
     if(hilos == NULL){
         hilos = malloc(sizeof(pthread_t) * cantidad_hilos);
         argumentos = malloc(sizeof(argumentos_hilo_t) * cantidad_hilos);
+
+        if (hilos == NULL || argumentos == NULL) {
+            fprintf(stderr, "Error: no se pudo reservar memoria para los hilos.\n");
+            free(hilos);
+            free(argumentos);
+            hilos = NULL;
+            argumentos = NULL;
+            return;
+        }
+
+        hilos_creados = cantidad_hilos;
+        activo = 1;
 
         siguiente_patron = 0;
 
@@ -108,7 +127,7 @@ void buscar_patrones_pthread(
 
             argumentos[i].patrones = patrones;
 
-            argumentos[i].cantidad_patrones = cantidad_patrones;
+            argumentos[i].cantidad_patrones = 0;
 
             argumentos[i].siguiente_patron = &siguiente_patron;
 
@@ -123,13 +142,35 @@ void buscar_patrones_pthread(
             argumentos[i].trabajos_pendientes = &trabajos_pendientes;
 
 
-            pthread_create(
+            if (pthread_create(
                 &hilos[i],
                 NULL,
                 trabajador_hilo,
                 &argumentos[i]
-            );
+            ) != 0) {
+                fprintf(stderr, "Error: no se pudo crear el hilo %d.\n", i);
+
+                pthread_mutex_lock(&mutex);
+                activo = 0;
+                pthread_cond_broadcast(&hay_trabajo);
+                pthread_mutex_unlock(&mutex);
+
+                for (int j = 0; j < i; j++) {
+                    pthread_join(hilos[j], NULL);
+                }
+
+                free(hilos);
+                free(argumentos);
+                hilos = NULL;
+                argumentos = NULL;
+                hilos_creados = 0;
+                activo = 1;
+                return;
+            }
         }
+    } else if (cantidad_hilos != hilos_creados) {
+        fprintf(stderr, "Error: el pool de hilos ya fue creado con %d hilos.\n", hilos_creados);
+        return;
     }
     
     pthread_mutex_lock(&mutex);
@@ -159,11 +200,12 @@ void buscar_patrones_pthread(
 }
 
 void destruir_hilos(int cantidad_hilos){
-    extern pthread_t* hilos;
-    extern pthread_mutex_t mutex;
-    extern pthread_cond_t hay_trabajo;
-    extern int activo;
-    extern argumentos_hilo_t* argumentos;
+    if (hilos == NULL) {
+        return;
+    }
+
+    (void)cantidad_hilos;
+    int total_hilos = hilos_creados;
 
     pthread_mutex_lock(&mutex);
 
@@ -173,10 +215,15 @@ void destruir_hilos(int cantidad_hilos){
 
     pthread_mutex_unlock(&mutex);
 
-    for(int i = 0; i < cantidad_hilos; i++){
+    for(int i = 0; i < total_hilos; i++){
         pthread_join(hilos[i], NULL);
     }
 
     free(hilos);
     free(argumentos);
+
+    hilos = NULL;
+    argumentos = NULL;
+    hilos_creados = 0;
+    activo = 1;
 }
