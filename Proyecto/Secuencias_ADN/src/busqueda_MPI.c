@@ -133,6 +133,7 @@ void busqueda_por_patron(const char* cadena_adn, int longitud_cadena_adn, patron
 
     } else {
 
+        patrones->encontrado_en = NO_ENCONTRADO;
         patrones->estado = NO_ENCONTRADO;
     }
 }

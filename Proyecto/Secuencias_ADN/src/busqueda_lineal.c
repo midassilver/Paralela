@@ -39,6 +39,7 @@ void buscar_patrones_lineal(const char* cadena_adn, int longitud_cadena_adn, pat
 
         } else {
 
+            patrones[p].encontrado_en = NO_ENCONTRADO;
             patrones[p].estado = NO_ENCONTRADO;
         }
     }
