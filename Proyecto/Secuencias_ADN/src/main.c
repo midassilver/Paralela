@@ -41,10 +41,10 @@ static void imprimir_resultados(patron_t* patrones, int cantidad_patrones) {
     }
 }
 
-static void imprimir_resumen_tiempo(const char* nombre, double inicio, double fin, patron_t* patrones, int cantidad_patrones) {
+static void imprimir_resumen_tiempo(const char* nombre, double tiempo, patron_t* patrones, int cantidad_patrones) {
     printf("Tiempo %s: %.6f segundos | Patrones encontrados: %d/%d\n",
         nombre,
-        fin - inicio,
+        tiempo,
         contar_coincidencias(patrones, cantidad_patrones),
         cantidad_patrones
     );
@@ -73,7 +73,9 @@ int main(int argc, char* argv[]) {
     buscar_patrones_lineal(cadena_adn,parametros.longitud_adn, patrones,parametros.cantidad_patrones);
     double fin = tiempo_actual_segundos();
 
-    imprimir_resumen_tiempo("lineal", inicio, fin, patrones, parametros.cantidad_patrones);
+    double tiempo_lineal = fin - inicio;
+
+    
     imprimir_resultados(patrones, parametros.cantidad_patrones);
 
     /*
@@ -85,7 +87,9 @@ int main(int argc, char* argv[]) {
     buscar_patrones_pthread(cadena_adn, parametros.longitud_adn,patrones, parametros.cantidad_patrones,parametros.numero_hilos);
     fin = tiempo_actual_segundos();
 
-    imprimir_resumen_tiempo("Pthreads", inicio, fin, patrones, parametros.cantidad_patrones);
+    double tiempo_pthread = fin - inicio;
+
+    
     imprimir_resultados(patrones, parametros.cantidad_patrones);
 
     destruir_hilos(parametros.numero_hilos);
@@ -95,16 +99,17 @@ int main(int argc, char* argv[]) {
     */
     printf("\n=== BUSQUEDA OPENCL ===\n");
 
+    double tiempo_openCL = 0.0;
     inicio = tiempo_actual_segundos();
     if (buscar_patrones_opencl(cadena_adn, parametros.longitud_adn, patrones, parametros.cantidad_patrones) == 0) {
         fin = tiempo_actual_segundos();
 
-        imprimir_resumen_tiempo("OpenCL", inicio, fin, patrones, parametros.cantidad_patrones);
+        tiempo_openCL = fin - inicio;
+        
         imprimir_resultados(patrones, parametros.cantidad_patrones);
 
     } else {
         fin = tiempo_actual_segundos();
-
         printf("No se pudo ejecutar la busqueda OpenCL. Tiempo intento: %.6f segundos\n", fin - inicio);
     }
 
@@ -117,9 +122,15 @@ int main(int argc, char* argv[]) {
     patron_t *patrones_MPI = buscar_patrones_MPI(parametros, cadena_adn, patrones);
     fin = tiempo_actual_segundos();
 
-    imprimir_resumen_tiempo("MPI", inicio, fin, patrones_MPI, parametros.cantidad_patrones);
+    double tiempo_MPI = fin - inicio;
+
+    
     imprimir_resultados(patrones_MPI, parametros.cantidad_patrones);
 
+    imprimir_resumen_tiempo("lineal", tiempo_lineal, patrones, parametros.cantidad_patrones);
+    imprimir_resumen_tiempo("Pthreads", tiempo_pthread, patrones, parametros.cantidad_patrones);
+    imprimir_resumen_tiempo("MPI", tiempo_MPI, patrones_MPI, parametros.cantidad_patrones);
+    imprimir_resumen_tiempo("OpenCL", tiempo_openCL, patrones, parametros.cantidad_patrones);
     /*
         Liberar memoria
     */
