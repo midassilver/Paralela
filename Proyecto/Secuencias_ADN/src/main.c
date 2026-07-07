@@ -131,6 +131,7 @@ int main(int argc, char* argv[]) {
     imprimir_resumen_tiempo("Pthreads", tiempo_pthread, patrones, parametros.cantidad_patrones);
     imprimir_resumen_tiempo("MPI", tiempo_MPI, patrones_MPI, parametros.cantidad_patrones);
     imprimir_resumen_tiempo("OpenCL", tiempo_openCL, patrones, parametros.cantidad_patrones);
+    
     /*
         Liberar memoria
     */
